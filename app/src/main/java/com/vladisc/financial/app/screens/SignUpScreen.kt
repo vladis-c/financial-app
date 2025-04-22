@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,6 +26,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -42,14 +48,31 @@ fun SignUpScreen(navController: NavController) {
     var company by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
     var dateOfBirth by rememberSaveable { mutableStateOf("") }
 
     var isLoading by remember { mutableStateOf(false) }
     var showError by remember { mutableStateOf(false) }
+    var canSignup by remember { mutableStateOf(false) }
 
     var fullWidth = Modifier
         .fillMaxWidth()
         .height(64.dp)
+
+    LaunchedEffect(confirmPassword, password) {
+        canSignup =
+            if (confirmPassword.isNotBlank()
+                && password.isNotBlank()
+                && lastName.isNotBlank()
+                && firstName.isNotBlank()
+                && dateOfBirth.isNotBlank()
+                && company.isNotBlank()
+            ) {
+                confirmPassword == password
+            } else {
+                false
+            }
+    }
 
     Column(
         Modifier
@@ -98,7 +121,25 @@ fun SignUpScreen(navController: NavController) {
             modifier = fullWidth,
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") })
+            label = { Text("Password") },
+            keyboardOptions = KeyboardOptions.Default.copy(
+                autoCorrectEnabled = false,
+                keyboardType = KeyboardType.NumberPassword,
+            ),
+            visualTransformation = PasswordVisualTransformation()
+        )
+        OutlinedTextField(
+            modifier = fullWidth,
+            value = confirmPassword,
+            onValueChange = { confirmPassword = it },
+            label = { Text("Confirm Password") },
+            keyboardOptions = KeyboardOptions.Default.copy(
+                autoCorrectEnabled = false,
+                keyboardType = KeyboardType.NumberPassword,
+            ),
+            visualTransformation = PasswordVisualTransformation()
+
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
         Button(
@@ -125,7 +166,7 @@ fun SignUpScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
-            enabled = !isLoading
+            enabled = canSignup && !isLoading
         ) {
             Text(if (isLoading) "Signing up..." else "Sign Up")
         }

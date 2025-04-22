@@ -1,6 +1,7 @@
 package com.vladisc.financial.app.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,40 +32,56 @@ import com.vladisc.financial.app.utils.DateUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-
 fun DatePicker(
     label: String = "Date of Birth",
     onDateSelected: (String) -> Unit
 ) {
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
+    var lastSelectedDate by remember { mutableStateOf<Long?>(null) }
+
     val selectedDate = datePickerState.selectedDateMillis?.let {
         DateUtils.convertMillisToDate(it)
     } ?: ""
 
-    LaunchedEffect(selectedDate) {
-        onDateSelected(selectedDate)
+    LaunchedEffect(datePickerState.selectedDateMillis) {
+        val newDate = datePickerState.selectedDateMillis
+        if (newDate != null && newDate != lastSelectedDate) {
+            lastSelectedDate = newDate
+            onDateSelected(selectedDate)
+            showDatePicker = false
+        }
     }
 
-    Box(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        OutlinedTextField(
-            value = selectedDate,
-            onValueChange = {},
-            label = { Text(label) },
-            readOnly = true,
-            trailingIcon = {
-                IconButton(onClick = { showDatePicker = !showDatePicker }) {
-                    Icon(
-                        imageVector = Icons.Default.DateRange,
-                        contentDescription = "Select date"
-                    )
-                }
-            },
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(64.dp)
+        ) {
+            OutlinedTextField(
+                value = selectedDate,
+                onValueChange = {},
+                label = { Text(label) },
+                trailingIcon = {
+                    IconButton(onClick = { showDatePicker = true }) {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = "Select date"
+                        )
+                    }
+                },
+                modifier = Modifier
+                    .matchParentSize(),
+                enabled = true,
+                readOnly = true,
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .clickable { showDatePicker = true }
         )
 
         if (showDatePicker) {
