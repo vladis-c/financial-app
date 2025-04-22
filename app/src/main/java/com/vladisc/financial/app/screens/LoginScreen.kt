@@ -14,17 +14,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -32,45 +29,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.vladisc.financial.app.api.ApiClient
-import com.vladisc.financial.app.components.DatePicker
-import com.vladisc.financial.app.utils.DateUtils
+import com.vladisc.financial.app.storage.TokenStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
-fun SignUpScreen(navController: NavController) {
-    var firstName by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
-    var company by remember { mutableStateOf("") }
+fun LoginScreen(navController: NavController) {
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
-    var dateOfBirth by rememberSaveable { mutableStateOf("") }
 
     var isLoading by remember { mutableStateOf(false) }
     var showError by remember { mutableStateOf(false) }
-    var canSignup by remember { mutableStateOf(false) }
+    var canLogin by remember { mutableStateOf(false) }
 
     var fullWidth = Modifier
         .fillMaxWidth()
         .height(64.dp)
 
-    LaunchedEffect(confirmPassword, password) {
-        canSignup =
-            if (confirmPassword.isNotBlank()
-                && password.isNotBlank()
-                && lastName.isNotBlank()
-                && firstName.isNotBlank()
-                && dateOfBirth.isNotBlank()
-                && company.isNotBlank()
-                && email.isNotBlank()
-            ) {
-                confirmPassword == password
-            } else {
-                false
-            }
+    LaunchedEffect(email, password) {
+        canLogin = email.isNotBlank() && password.isNotBlank()
     }
 
     Column(
@@ -85,32 +65,12 @@ fun SignUpScreen(navController: NavController) {
                 .padding(16.dp),
         ) {
             Text(
-                text = "Sign up",
+                text = "Log in",
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold
             )
         }
-        OutlinedTextField(
-            modifier = fullWidth,
-            value = firstName,
-            onValueChange = { firstName = it },
-            label = { Text("First Name") })
-        OutlinedTextField(
-            modifier = fullWidth,
-            value = lastName,
-            onValueChange = { lastName = it },
-            label = { Text("Last Name") })
-        OutlinedTextField(
-            modifier = fullWidth,
-            value = company,
-            onValueChange = { company = it },
-            label = { Text("Company") })
-        DatePicker(
-            onDateSelected = {
-                dateOfBirth = DateUtils.convertDateFromPatternToISO(it, "d.M.yyyy")
-            },
-            label = "Date of Birth",
-        )
+
         OutlinedTextField(
             modifier = fullWidth,
             value = email,
@@ -127,18 +87,6 @@ fun SignUpScreen(navController: NavController) {
             ),
             visualTransformation = PasswordVisualTransformation()
         )
-        OutlinedTextField(
-            modifier = fullWidth,
-            value = confirmPassword,
-            onValueChange = { confirmPassword = it },
-            label = { Text("Confirm Password") },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                autoCorrectEnabled = false,
-                keyboardType = KeyboardType.NumberPassword,
-            ),
-            visualTransformation = PasswordVisualTransformation()
-
-        )
 
         Spacer(modifier = Modifier.height(16.dp))
         Button(
@@ -148,7 +96,7 @@ fun SignUpScreen(navController: NavController) {
 
                 CoroutineScope(Dispatchers.IO).launch {
                     val success =
-                        ApiClient.signUp(firstName, lastName, company, email, password, dateOfBirth)
+                        ApiClient.login(email, password)
                     withContext(Dispatchers.Main) {
                         isLoading = false
                         if (success) {
@@ -165,26 +113,10 @@ fun SignUpScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
-            enabled = canSignup && !isLoading
+            enabled = canLogin && !isLoading
         ) {
-            Text(if (isLoading) "Signing up..." else "Sign Up")
+            Text(if (isLoading) "Logging in..." else "Log In")
         }
-
-        if (showError) {
-            Text("Sign up failed", color = Color.Red)
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-        TextButton(
-            modifier = Modifier
-                .align(alignment = Alignment.CenterHorizontally)
-                .fillMaxWidth()
-                .height(36.dp),
-            onClick = { navController.navigate("login") }) {
-            Text(
-                "Already have an account? Log in",
-
-                )
-        }
+        Text(TokenStorage.getAccessToken()?: "sss")
     }
 }
