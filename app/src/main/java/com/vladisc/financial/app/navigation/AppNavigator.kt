@@ -4,20 +4,19 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.vladisc.financial.app.screens.HomeScreen
 import com.vladisc.financial.app.screens.LoginScreen
 import com.vladisc.financial.app.screens.SignUpScreen
+import com.vladisc.financial.app.screens.SplashScreen
 
 @Composable
 fun AppNavigator() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "signup") {
+    NavHost(navController = navController, startDestination = "splash") {
+        composable("splash") { SplashScreen(navController) }
         composable("signup") { SignUpScreen(navController) }
         composable("login") { LoginScreen(navController) }
-//        composable("home/{firstName}/{lastName}") { backStackEntry ->
-//            val firstName = backStackEntry.arguments?.getString("firstName") ?: ""
-//            val lastName = backStackEntry.arguments?.getString("lastName") ?: ""
-//            HomeScreen(firstName, lastName)
-//        }
+        composable("home") { HomeScreen(navController) }
     }
 }

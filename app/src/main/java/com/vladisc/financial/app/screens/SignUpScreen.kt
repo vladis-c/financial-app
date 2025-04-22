@@ -152,11 +152,9 @@ fun SignUpScreen(navController: NavController) {
                     withContext(Dispatchers.Main) {
                         isLoading = false
                         if (success) {
-                            println("success")
-//                        navController.navigate("home/$firstName/$lastName")
-
+                            navController.navigate("home")
                         } else {
-                            println("error")
+                            println("error") // debug
                             showError = true
                         }
                     }

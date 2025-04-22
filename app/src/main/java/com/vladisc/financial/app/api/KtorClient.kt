@@ -77,4 +77,12 @@ object ApiClient {
 
         return response.status == HttpStatusCode.OK
     }
+
+    suspend fun validate(): Boolean {
+        val response = client.post("$URL/auth/validate")
+        val setCookieHeaders = response.headers.getAll("Set-Cookie") ?: emptyList()
+        TokenStorage.extractCookies(setCookieHeaders)
+
+        return response.status == HttpStatusCode.OK
+    }
 }
