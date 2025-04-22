@@ -1,0 +1,9 @@
+[versions]
+navigation = "2.8.9"
+lifecycle = "2.8.7"
+
+[libraries]
+navigation = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
+lifecycle = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+
+[plugins]
