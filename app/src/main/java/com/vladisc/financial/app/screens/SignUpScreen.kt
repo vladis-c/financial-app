@@ -17,10 +17,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -39,38 +40,72 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+enum class FormFieldKey {
+    FirstName, LastName, Company, Email, Password, ConfirmPassword, DateOfBirth
+}
+
+data class FormField(
+    val key: FormFieldKey,
+    val label: String,
+    val isSecure: Boolean = false,
+    val state: MutableState<String>
+)
+
 @Composable
 fun SignUpScreen(navController: NavController) {
-    var firstName by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
-    var company by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
-    var dateOfBirth by rememberSaveable { mutableStateOf("") }
-
     var isLoading by remember { mutableStateOf(false) }
     var showError by remember { mutableStateOf(false) }
     var canSignup by remember { mutableStateOf(false) }
 
-    var fullWidth = Modifier
+    val fullWidth = Modifier
         .fillMaxWidth()
         .height(64.dp)
 
-    LaunchedEffect(confirmPassword, password) {
-        canSignup =
-            if (confirmPassword.isNotBlank()
-                && password.isNotBlank()
-                && lastName.isNotBlank()
-                && firstName.isNotBlank()
-                && dateOfBirth.isNotBlank()
-                && company.isNotBlank()
-                && email.isNotBlank()
-            ) {
-                confirmPassword == password
-            } else {
-                false
-            }
+    val formFields = remember {
+        mapOf(
+            "firstName" to FormField(
+                key = FormFieldKey.FirstName,
+                label = "First Name",
+                state = mutableStateOf("")
+            ),
+            "lastName" to FormField(
+                key = FormFieldKey.LastName,
+                label = "Last Name",
+                state = mutableStateOf("")
+            ),
+            "company" to FormField(
+                key = FormFieldKey.Company,
+                label = "Company",
+                state = mutableStateOf("")
+            ),
+            "email" to FormField(
+                key = FormFieldKey.Email,
+                label = "Email",
+                state = mutableStateOf("")
+            ),
+            "password" to FormField(
+                key = FormFieldKey.Password,
+                label = "Password",
+                isSecure = true,
+                state = mutableStateOf("")
+            ),
+            "confirmPassword" to FormField(
+                key = FormFieldKey.ConfirmPassword,
+                label = "Confirm Password",
+                isSecure = true,
+                state = mutableStateOf("")
+            ),
+            "dateOfBirth" to FormField(
+                key = FormFieldKey.DateOfBirth,
+                label = "Date of Birth",
+                state = mutableStateOf("")
+            )
+        )
+    }
+
+    LaunchedEffect(formFields.map { it.value.state.value }) {
+        val values = formFields.map { it.value.state.value }
+        canSignup = values.all { it.isNotBlank() } && values[4] == values[5]
     }
 
     Column(
@@ -90,56 +125,30 @@ fun SignUpScreen(navController: NavController) {
                 fontWeight = FontWeight.Bold
             )
         }
-        OutlinedTextField(
-            modifier = fullWidth,
-            value = firstName,
-            onValueChange = { firstName = it },
-            label = { Text("First Name") })
-        OutlinedTextField(
-            modifier = fullWidth,
-            value = lastName,
-            onValueChange = { lastName = it },
-            label = { Text("Last Name") })
-        OutlinedTextField(
-            modifier = fullWidth,
-            value = company,
-            onValueChange = { company = it },
-            label = { Text("Company") })
-        DatePicker(
-            onDateSelected = {
-                dateOfBirth = DateUtils.convertDateFromPatternToISO(it, "d.M.yyyy")
-            },
-            label = "Date of Birth",
-        )
-        OutlinedTextField(
-            modifier = fullWidth,
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") })
-        OutlinedTextField(
-            modifier = fullWidth,
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Password") },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                autoCorrectEnabled = false,
-                keyboardType = KeyboardType.NumberPassword,
-            ),
-            visualTransformation = PasswordVisualTransformation()
-        )
-        OutlinedTextField(
-            modifier = fullWidth,
-            value = confirmPassword,
-            onValueChange = { confirmPassword = it },
-            label = { Text("Confirm Password") },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                autoCorrectEnabled = false,
-                keyboardType = KeyboardType.NumberPassword,
-            ),
-            visualTransformation = PasswordVisualTransformation()
-
-        )
-
+        formFields.forEach { formField ->
+            val field = formField.value
+            if (field.key == FormFieldKey.DateOfBirth) {
+                DatePicker(
+                    onDateSelected = {
+                        field.state.value = DateUtils.convertDateFromPatternToISO(it, "d.M.yyyy")
+                    },
+                    label = field.label,
+                )
+            } else {
+                OutlinedTextField(
+                    modifier = fullWidth,
+                    value = field.state.value,
+                    onValueChange = { field.state.value = it },
+                    label = { Text(field.label) },
+                    visualTransformation = if (field.isSecure) PasswordVisualTransformation() else VisualTransformation.None,
+                    keyboardOptions = if (field.isSecure)
+                        KeyboardOptions.Default.copy(
+                            autoCorrectEnabled = false,
+                            keyboardType = KeyboardType.NumberPassword
+                        ) else KeyboardOptions.Default
+                )
+            }
+        }
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
@@ -148,7 +157,14 @@ fun SignUpScreen(navController: NavController) {
 
                 CoroutineScope(Dispatchers.IO).launch {
                     val success =
-                        ApiClient.signUp(firstName, lastName, company, email, password, dateOfBirth)
+                        ApiClient.signUp(
+                            formFields["firstName"]!!.state.value,
+                            formFields["lastName"]!!.state.value,
+                            formFields["company"]!!.state.value,
+                            formFields["email"]!!.state.value,
+                            formFields["password"]!!.state.value,
+                            formFields["dateOfBirth"]!!.state.value,
+                        )
                     withContext(Dispatchers.Main) {
                         isLoading = false
                         if (success) {
@@ -181,8 +197,7 @@ fun SignUpScreen(navController: NavController) {
             onClick = { navController.navigate("login") }) {
             Text(
                 "Already have an account? Log in",
-
-                )
+            )
         }
     }
 }
