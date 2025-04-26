@@ -37,7 +37,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.vladisc.financial.app.api.ApiClient
+import com.vladisc.financial.app.api.AuthApi
 import com.vladisc.financial.app.components.DatePicker
 import com.vladisc.financial.app.utils.DateUtils
 import kotlinx.coroutines.CoroutineScope
@@ -171,7 +171,7 @@ fun SignUpScreen(navController: NavController) {
                 showError = false
                 CoroutineScope(Dispatchers.IO).launch {
                     val success =
-                        ApiClient.signUp(
+                        AuthApi.signUp(
                             formFields[SignUpForm.FieldKey.FirstName]!!.state.value,
                             formFields[SignUpForm.FieldKey.LastName]!!.state.value,
                             formFields[SignUpForm.FieldKey.Company]!!.state.value,

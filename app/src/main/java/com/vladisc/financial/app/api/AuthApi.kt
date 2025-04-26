@@ -56,7 +56,7 @@ object AuthApi {
     }
 
     suspend fun validate(): Boolean {
-        TokenStorage.clear()
+//        TokenStorage.clear()
         val response = client.post("$URL/auth/validate")
         val setCookieHeaders = response.headers.getAll("Set-Cookie") ?: emptyList()
         TokenStorage.extractCookies(setCookieHeaders)

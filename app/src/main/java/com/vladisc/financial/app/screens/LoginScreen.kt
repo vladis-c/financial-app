@@ -36,7 +36,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.vladisc.financial.app.api.ApiClient
+import com.vladisc.financial.app.api.AuthApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -132,7 +132,7 @@ fun LoginScreen(navController: NavController) {
 
                 CoroutineScope(Dispatchers.IO).launch {
                     val success =
-                        ApiClient.login(
+                        AuthApi.login(
                             formFields[LoginForm.FieldKey.Email]!!.state.value,
                             formFields[LoginForm.FieldKey.Password]!!.state.value,
                         )

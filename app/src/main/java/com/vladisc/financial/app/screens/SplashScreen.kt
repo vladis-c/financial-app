@@ -8,13 +8,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import com.vladisc.financial.app.api.ApiClient
+import com.vladisc.financial.app.api.AuthApi
 
 @Composable
 fun SplashScreen(navController: NavController) {
     LaunchedEffect (Unit) {
         val isValid = try {
-            ApiClient.validate()
+            AuthApi.validate()
         } catch (_: Exception) {
             false
         }

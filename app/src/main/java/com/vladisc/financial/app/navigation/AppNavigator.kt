@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.vladisc.financial.app.api.UserViewModel
 import com.vladisc.financial.app.screens.HomeScreen
 import com.vladisc.financial.app.screens.LoginScreen
 import com.vladisc.financial.app.screens.SignUpScreen
@@ -12,11 +13,12 @@ import com.vladisc.financial.app.screens.SplashScreen
 @Composable
 fun AppNavigator() {
     val navController = rememberNavController()
+    val userViewModel = UserViewModel()
 
     NavHost(navController = navController, startDestination = "splash") {
         composable("splash") { SplashScreen(navController) }
         composable("signup") { SignUpScreen(navController) }
         composable("login") { LoginScreen(navController) }
-        composable("home") { HomeScreen(navController) }
+        composable("home") { HomeScreen(navController, userViewModel) }
     }
 }

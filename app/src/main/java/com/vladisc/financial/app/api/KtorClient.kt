@@ -28,26 +28,4 @@ object ApiClient {
             })
         }
     }
-
-    suspend fun signUp(
-        firstName: String,
-        lastName: String,
-        company: String,
-        email: String,
-        password: String,
-        dateOfBirth: String
-    ): Boolean {
-        return AuthApi.signUp(firstName, lastName, company, email, password, dateOfBirth)
-    }
-
-    suspend fun login(
-        email: String,
-        password: String,
-    ): Boolean {
-       return AuthApi.login(email, password)
-    }
-
-    suspend fun validate(): Boolean {
-        return AuthApi.validate()
-    }
 }
