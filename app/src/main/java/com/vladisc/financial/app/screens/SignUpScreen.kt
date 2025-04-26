@@ -211,7 +211,7 @@ fun SignUpScreen(navController: NavController) {
             Text(
                 text = "Already have an account? Log in",
             )
-            Spacer(modifier = Modifier.height(16.dp))
         }
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }

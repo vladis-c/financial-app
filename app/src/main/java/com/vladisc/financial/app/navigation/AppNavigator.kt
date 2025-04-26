@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import com.vladisc.financial.app.api.UserViewModel
 import com.vladisc.financial.app.screens.HomeScreen
 import com.vladisc.financial.app.screens.LoginScreen
+import com.vladisc.financial.app.screens.SelectAppsScreen
 import com.vladisc.financial.app.screens.SignUpScreen
 import com.vladisc.financial.app.screens.SplashScreen
 
@@ -19,5 +20,6 @@ fun AppNavigator(userViewModel: UserViewModel){
         composable("signup") { SignUpScreen(navController) }
         composable("login") { LoginScreen(navController) }
         composable("home") { HomeScreen(navController, userViewModel) }
+        composable("select_apps") { SelectAppsScreen(navController, userViewModel) }
     }
 }
