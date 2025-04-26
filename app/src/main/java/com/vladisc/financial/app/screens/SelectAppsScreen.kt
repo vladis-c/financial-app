@@ -1,6 +1,7 @@
 package com.vladisc.financial.app.screens
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import androidx.compose.foundation.layout.Arrangement
@@ -46,8 +47,7 @@ fun SelectAppsScreen(
 
     // Get all installed apps
     val apps = remember {
-        packageManager.getInstalledApplications(0)
-//            .filter { it.flags and ApplicationInfo.FLAG_SYSTEM == 0 } // Exclude system apps
+        packageManager.getInstalledApplications(PackageManager.GET_META_DATA)
             .sortedBy { packageManager.getApplicationLabel(it).toString() }
     }
 
@@ -63,10 +63,12 @@ fun SelectAppsScreen(
     ) {
         items(apps) { app ->
             val appName = packageManager.getApplicationLabel(app).toString()
+            val appIcon = packageManager.getApplicationIcon(app)
             val isSelected = selectedApps.contains(app.packageName)
 
             CheckboxRow(
                 appName = appName,
+                appIcon = appIcon,
                 packageName = app.packageName,
                 isSelected = isSelected,
                 onCheckedChange = { checked ->
