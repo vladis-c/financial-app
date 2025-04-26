@@ -11,9 +11,8 @@ import com.vladisc.financial.app.screens.SignUpScreen
 import com.vladisc.financial.app.screens.SplashScreen
 
 @Composable
-fun AppNavigator() {
+fun AppNavigator(userViewModel: UserViewModel){
     val navController = rememberNavController()
-    val userViewModel = UserViewModel()
 
     NavHost(navController = navController, startDestination = "splash") {
         composable("splash") { SplashScreen(navController) }
