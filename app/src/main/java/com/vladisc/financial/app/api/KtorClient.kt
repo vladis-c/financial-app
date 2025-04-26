@@ -5,16 +5,12 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.header
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
 object ApiClient {
-    const val URL = "http://10.43.142.51:7070"
+    //    const val URL = "http://10.43.142.51:7070"
+    const val URL = "http://192.168.1.203:7070"
     val client = HttpClient(OkHttp) {
         install(ContentNegotiation) {
             json(Json {
@@ -41,49 +37,17 @@ object ApiClient {
         password: String,
         dateOfBirth: String
     ): Boolean {
-        val response = client.post("$URL/auth/signup") {
-            contentType(ContentType.Application.Json)
-            setBody(
-                mapOf(
-                    "firstName" to firstName,
-                    "lastName" to lastName,
-                    "company" to company,
-                    "email" to email,
-                    "password" to password,
-                    "dateOfBirth" to dateOfBirth
-                )
-            )
-        }
-        val setCookieHeaders = response.headers.getAll("Set-Cookie") ?: emptyList()
-        TokenStorage.extractCookies(setCookieHeaders)
-        return response.status == HttpStatusCode.Created
+        return AuthApi.signUp(firstName, lastName, company, email, password, dateOfBirth)
     }
 
     suspend fun login(
         email: String,
         password: String,
     ): Boolean {
-        val response = client.post("$URL/auth/login") {
-            contentType(ContentType.Application.Json)
-            setBody(
-                mapOf(
-                    "email" to email,
-                    "password" to password,
-                )
-            )
-        }
-        val setCookieHeaders = response.headers.getAll("Set-Cookie") ?: emptyList()
-        TokenStorage.extractCookies(setCookieHeaders)
-
-        return response.status == HttpStatusCode.OK
+       return AuthApi.login(email, password)
     }
 
     suspend fun validate(): Boolean {
-        TokenStorage.clear()
-        val response = client.post("$URL/auth/validate")
-        val setCookieHeaders = response.headers.getAll("Set-Cookie") ?: emptyList()
-        TokenStorage.extractCookies(setCookieHeaders)
-
-        return response.status == HttpStatusCode.OK
+        return AuthApi.validate()
     }
 }
