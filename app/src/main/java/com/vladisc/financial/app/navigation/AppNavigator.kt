@@ -20,6 +20,6 @@ fun AppNavigator(userViewModel: UserViewModel){
         composable("signup") { SignUpScreen(navController) }
         composable("login") { LoginScreen(navController) }
         composable("home") { HomeScreen(navController, userViewModel) }
-        composable("select_apps") { SelectAppsScreen(navController, userViewModel) }
+        composable("select_apps") { SelectAppsScreen(navController) }
     }
 }

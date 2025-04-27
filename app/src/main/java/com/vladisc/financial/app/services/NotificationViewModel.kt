@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class NotificationViewModel(application: Application) : AndroidViewModel(application) {
     companion object {
@@ -28,16 +29,26 @@ class NotificationViewModel(application: Application) : AndroidViewModel(applica
     private val dao = AppDatabase.getInstance(application).notificationDao()
 
     private val _userId = MutableStateFlow<String?>(null)
+    private val _notifications = MutableStateFlow<List<Notification>>(emptyList())
+    val notifications: StateFlow<List<Notification>> = _notifications
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val notifications: StateFlow<List<Notification>> = _userId
-        .filterNotNull()
-        .flatMapLatest { uid ->
-            dao.getNotificationsForUser(uid) // Flow from Room
-        }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    private var currentOffset = 0
+    private val pageSize = 20
 
     fun setUserId(uid: String) {
         _userId.value = uid
+        currentOffset = 0
+        _notifications.value = emptyList()
+        loadMore()
+    }
+
+    fun loadMore() {
+        val uid = _userId.value ?: return
+
+        viewModelScope.launch {
+            val newItems = dao.getNotificationsForUser(uid, pageSize, currentOffset)
+            _notifications.value = _notifications.value + newItems
+            currentOffset += newItems.size
+        }
     }
 }

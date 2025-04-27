@@ -10,14 +10,19 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun NotificationItem(
     title: String,
-    body: String
+    body: String,
+    packageName: String,
 ) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
         Text(text = title)
         Spacer(modifier = Modifier.height(4.dp))
         Text(text = body)
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(text = packageName)
         HorizontalDivider(modifier = Modifier.padding(top = 8.dp))
     }
 }

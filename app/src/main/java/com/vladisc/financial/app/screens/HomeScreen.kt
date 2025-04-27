@@ -13,14 +13,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -48,8 +50,6 @@ fun HomeScreen(
 
     val notifications by notificationViewModel.notifications.collectAsState()
 
-    val scrollState = rememberScrollState()
-
     LaunchedEffect(Unit) {
         userViewModel.getUser()
     }
@@ -67,27 +67,29 @@ fun HomeScreen(
         }
     }
 
-    Column(
+    val listState = rememberLazyListState()
+
+    //TODO: fix this screen view
+    Box(
         modifier = Modifier
-            .fillMaxWidth()
             .padding(24.dp, 24.dp, 24.dp, 32.dp)
             .windowInsetsPadding(WindowInsets.statusBars)
-            .verticalScroll(scrollState)
-            .imePadding() // Handles keyboard insets
-            .wrapContentSize(Alignment.Center),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+            .imePadding()
+            .wrapContentSize(Alignment.Center)
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
+
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
             if (user != null) {
                 Text("Welcome, ${user?.firstName ?: "User"}!")
             } else {
                 Text("Loading...")
             }
         }
-
         TextButton(
             modifier = Modifier
-                .align(alignment = Alignment.CenterHorizontally)
+//            .align(alignment = Alignment.CenterHorizontally)
                 .fillMaxWidth()
                 .height(48.dp),
             onClick = { navController.navigate("select_apps") }) {
@@ -95,12 +97,30 @@ fun HomeScreen(
                 text = "Select banking app",
             )
         }
-
-        notifications.forEach { notification ->
-            NotificationItem(
-                title = notification.title ?: "",
-                body = notification.body ?: ""
-            )
+        LazyColumn(
+            state = listState, modifier = Modifier
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(notifications) { notification ->
+                NotificationItem(
+                    notification.title ?: "",
+                    notification.body ?: "",
+                    notification.packageName,
+                )
+            }
         }
+
+    }
+
+    // Detect when scrolled to bottom
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.layoutInfo }
+            .collect { layoutInfo ->
+                val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
+                if (lastVisibleItem != null && lastVisibleItem.index >= notifications.size - 5) {
+                    notificationViewModel.loadMore()
+                }
+            }
     }
 }

@@ -8,8 +8,8 @@ interface NotificationDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(notification: Notification)
 
-    @Query("SELECT * FROM notifications WHERE userId = :userId ORDER BY timestamp DESC")
-    fun getNotificationsForUser(userId: String): Flow<List<Notification>>
+    @Query("SELECT * FROM notifications WHERE userId = :userId ORDER BY timestamp DESC LIMIT :limit OFFSET :offset")
+    suspend fun getNotificationsForUser(userId: String, limit: Int, offset: Int): List<Notification>
 
     @Query("DELETE FROM notifications WHERE userId = :userId")
     suspend fun deleteNotificationsForUser(userId: String)

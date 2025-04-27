@@ -3,6 +3,7 @@ package com.vladisc.financial.app.services
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
+import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -64,8 +65,11 @@ class NotificationListener() : NotificationListenerService() {
     }
 
     private fun shouldMonitorPackage(packageName: String): Boolean {
-        println(packageName)
-        // TODO: check your stored selected apps
-        return true
+        val prefs = applicationContext.getSharedPreferences("prefs", 0)
+        val allowedApps = prefs.getStringSet("allowed_apps", emptySet()) ?: emptySet()
+
+        println("Checking $packageName against allowed apps: $allowedApps")
+
+        return allowedApps.contains(packageName)
     }
 }
