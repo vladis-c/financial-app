@@ -3,11 +3,11 @@ package com.vladisc.financial.app.services
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
-import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
+// TODO check WorkManager background service
 class NotificationListener() : NotificationListenerService() {
     private lateinit var db: AppDatabase
     override fun onCreate() {
@@ -51,7 +51,7 @@ class NotificationListener() : NotificationListenerService() {
                 packageName = packageName,
                 title = title,
                 body = text ?: bigText,
-                timestamp = System.currentTimeMillis()
+                timestamp = System.currentTimeMillis(),
             )
 
             GlobalScope.launch {

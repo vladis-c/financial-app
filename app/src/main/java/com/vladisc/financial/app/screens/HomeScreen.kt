@@ -3,7 +3,6 @@ package com.vladisc.financial.app.screens
 import android.app.Application
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,12 +26,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.edit
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.vladisc.financial.app.api.UserViewModel
 import com.vladisc.financial.app.components.NotificationItem
 import com.vladisc.financial.app.services.NotificationViewModel
-import androidx.core.content.edit
 
 @Composable
 fun HomeScreen(
@@ -119,7 +118,7 @@ fun HomeScreen(
             .collect { layoutInfo ->
                 val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
                 if (lastVisibleItem != null && lastVisibleItem.index >= notifications.size - 5) {
-                    notificationViewModel.loadMore()
+                    // TODO paging
                 }
             }
     }

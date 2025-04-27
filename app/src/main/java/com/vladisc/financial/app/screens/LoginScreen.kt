@@ -97,7 +97,7 @@ fun LoginScreen(navController: NavController) {
             .imePadding() // Handles keyboard insets
             .wrapContentSize(Alignment.Center),
         verticalArrangement = Arrangement.spacedBy(8.dp)
-    )  {
+    ) {
         Box(
             modifier = Modifier
                 .align(alignment = Alignment.CenterHorizontally)

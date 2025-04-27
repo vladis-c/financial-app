@@ -12,7 +12,7 @@ import com.vladisc.financial.app.api.AuthApi
 
 @Composable
 fun SplashScreen(navController: NavController) {
-    LaunchedEffect (Unit) {
+    LaunchedEffect(Unit) {
         val isValid = try {
             AuthApi.validate()
         } catch (_: Exception) {
