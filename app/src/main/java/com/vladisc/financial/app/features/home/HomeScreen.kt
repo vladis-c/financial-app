@@ -1,4 +1,4 @@
-package com.vladisc.financial.app.screens
+package com.vladisc.financial.app.features.home
 
 import android.app.Application
 import androidx.compose.foundation.layout.Arrangement
@@ -29,9 +29,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.vladisc.financial.app.api.UserViewModel
-import com.vladisc.financial.app.components.NotificationItem
-import com.vladisc.financial.app.services.NotificationViewModel
+import com.vladisc.financial.app.features.notifications.NotificationItem
+import com.vladisc.financial.app.features.notifications.NotificationViewModel
+import com.vladisc.financial.app.features.user.UserViewModel
 
 @Composable
 fun HomeScreen(
@@ -98,7 +98,7 @@ fun HomeScreen(
         }
         LazyColumn(
             state = listState, modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth().padding(0.dp, 100.dp, 0.dp, 0.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(notifications) { notification ->

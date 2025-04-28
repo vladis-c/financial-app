@@ -1,4 +1,4 @@
-package com.vladisc.financial.app.services
+package com.vladisc.financial.app.features.notifications
 
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
@@ -39,10 +39,17 @@ class NotificationListener() : NotificationListenerService() {
         val notification = sbn.notification
 
         val title = notification.extras.getString(android.app.Notification.EXTRA_TITLE)
-        val text = notification.extras.getString(android.app.Notification.EXTRA_TEXT)
+        var text = notification.extras.getString(android.app.Notification.EXTRA_TEXT)
         val bigText = notification.extras.getString(android.app.Notification.EXTRA_BIG_TEXT)
+        val subText = notification.extras.getString(android.app.Notification.EXTRA_SUB_TEXT)
+        val infoText = notification.extras.getString(android.app.Notification.EXTRA_INFO_TEXT)
 
-        Log.d("NotificationListener", "Notification from $packageName: $title - $text - $bigText")
+        // fallback to bigText, subText, infoText if needed
+        if (text.isNullOrBlank()) {
+            text = bigText ?: subText ?: infoText
+        }
+
+        Log.d("NotificationListener", "Notification from $packageName: $title - $text - $bigText - $subText - $infoText")
 
 
         if (shouldMonitorPackage(packageName)) {
@@ -50,7 +57,7 @@ class NotificationListener() : NotificationListenerService() {
                 userId = userId,
                 packageName = packageName,
                 title = title,
-                body = text ?: bigText,
+                body = text,
                 timestamp = System.currentTimeMillis(),
             )
 

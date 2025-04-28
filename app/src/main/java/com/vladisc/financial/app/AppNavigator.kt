@@ -1,15 +1,15 @@
-package com.vladisc.financial.app.navigation
+package com.vladisc.financial.app
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.vladisc.financial.app.api.UserViewModel
-import com.vladisc.financial.app.screens.HomeScreen
-import com.vladisc.financial.app.screens.LoginScreen
-import com.vladisc.financial.app.screens.SelectAppsScreen
-import com.vladisc.financial.app.screens.SignUpScreen
-import com.vladisc.financial.app.screens.SplashScreen
+import com.vladisc.financial.app.features.auth.LoginScreen
+import com.vladisc.financial.app.features.auth.SignUpScreen
+import com.vladisc.financial.app.features.auth.SplashScreen
+import com.vladisc.financial.app.features.home.HomeScreen
+import com.vladisc.financial.app.features.selectapps.SelectAppsScreen
+import com.vladisc.financial.app.features.user.UserViewModel
 
 @Composable
 fun AppNavigator(userViewModel: UserViewModel){

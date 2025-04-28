@@ -1,4 +1,4 @@
-package com.vladisc.financial.app.services
+package com.vladisc.financial.app.features.notifications
 
 import android.content.Context
 import androidx.room.Database

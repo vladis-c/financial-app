@@ -1,4 +1,4 @@
-package com.vladisc.financial.app.services
+package com.vladisc.financial.app.features.notifications
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

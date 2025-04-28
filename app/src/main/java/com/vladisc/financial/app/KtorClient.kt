@@ -1,8 +1,9 @@
-package com.vladisc.financial.app.api
+package com.vladisc.financial.app
 
-import com.vladisc.financial.app.storage.TokenStorage
+import com.vladisc.financial.app.features.auth.TokenStorage
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.header
 import io.ktor.serialization.kotlinx.json.json
@@ -17,7 +18,7 @@ object ApiClient {
                 ignoreUnknownKeys = true
             })
         }
-        install(io.ktor.client.plugins.DefaultRequest) {
+        install(DefaultRequest) {
             header("Cookie", buildString {
                 TokenStorage.getAccessToken()?.let {
                     append("accessToken=$it; ")

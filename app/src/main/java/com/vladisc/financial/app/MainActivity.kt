@@ -7,11 +7,10 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.vladisc.financial.app.api.UserViewModel
+import com.vladisc.financial.app.features.auth.TokenStorage
+import com.vladisc.financial.app.features.notifications.NotificationListener
+import com.vladisc.financial.app.features.user.UserViewModel
 import com.vladisc.financial.app.ui.theme.FinancialAppTheme
-import com.vladisc.financial.app.navigation.AppNavigator
-import com.vladisc.financial.app.services.NotificationListener
-import com.vladisc.financial.app.storage.TokenStorage
 
 class MainActivity : ComponentActivity() {
     val userViewModel = UserViewModel()

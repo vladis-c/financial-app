@@ -1,4 +1,4 @@
-package com.vladisc.financial.app.models
+package com.vladisc.financial.app.features.user
 
 import kotlinx.serialization.Serializable
 

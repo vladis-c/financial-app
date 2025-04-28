@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.utils.loadPropertyFromResources
-
 plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "2.1.20"
     id("com.google.devtools.ksp")
@@ -69,6 +67,7 @@ dependencies {
 
     // Kotlinx serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
+    implementation("androidx.activity:activity-ktx:1.8.2")
 
     // Coroutine support
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")

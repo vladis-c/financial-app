@@ -1,4 +1,4 @@
-package com.vladisc.financial.app.screens
+package com.vladisc.financial.app.features.auth
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,21 +30,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.vladisc.financial.app.api.AuthApi
+import com.vladisc.financial.app.components.DatePicker
+import com.vladisc.financial.app.utils.DateUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class LoginForm {
+class SignUpForm {
     enum class FieldKey {
-        Email, Password
+        FirstName, LastName, Company, Email, Password, ConfirmPassword, DateOfBirth
     }
 
     data class FormField(
@@ -55,29 +57,54 @@ class LoginForm {
     )
 }
 
-
 @Composable
-fun LoginScreen(navController: NavController) {
+fun SignUpScreen(navController: NavController) {
     var isLoading by remember { mutableStateOf(false) }
     var showError by remember { mutableStateOf(false) }
-    var canLogin by remember { mutableStateOf(false) }
+    var canSignup by remember { mutableStateOf(false) }
 
-    var fullWidth = Modifier
+    val fullWidth = Modifier
         .fillMaxWidth()
         .height(64.dp)
     val scrollState = rememberScrollState()
 
     val formFields = remember {
         mapOf(
-            LoginForm.FieldKey.Email to LoginForm.FormField(
-                key = LoginForm.FieldKey.Email,
+            SignUpForm.FieldKey.FirstName to SignUpForm.FormField(
+                key = SignUpForm.FieldKey.FirstName,
+                label = "First Name",
+                state = mutableStateOf("")
+            ),
+            SignUpForm.FieldKey.LastName to SignUpForm.FormField(
+                key = SignUpForm.FieldKey.LastName,
+                label = "Last Name",
+                state = mutableStateOf("")
+            ),
+            SignUpForm.FieldKey.Company to SignUpForm.FormField(
+                key = SignUpForm.FieldKey.Company,
+                label = "Company",
+                state = mutableStateOf("")
+            ),
+            SignUpForm.FieldKey.Email to SignUpForm.FormField(
+                key = SignUpForm.FieldKey.Email,
                 label = "Email",
                 state = mutableStateOf("")
             ),
-            LoginForm.FieldKey.Password to LoginForm.FormField(
-                key = LoginForm.FieldKey.Password,
+            SignUpForm.FieldKey.Password to SignUpForm.FormField(
+                key = SignUpForm.FieldKey.Password,
                 label = "Password",
                 isSecure = true,
+                state = mutableStateOf("")
+            ),
+            SignUpForm.FieldKey.ConfirmPassword to SignUpForm.FormField(
+                key = SignUpForm.FieldKey.ConfirmPassword,
+                label = "Confirm Password",
+                isSecure = true,
+                state = mutableStateOf("")
+            ),
+            SignUpForm.FieldKey.DateOfBirth to SignUpForm.FormField(
+                key = SignUpForm.FieldKey.DateOfBirth,
+                label = "Date of Birth",
                 state = mutableStateOf("")
             ),
         )
@@ -85,7 +112,7 @@ fun LoginScreen(navController: NavController) {
 
     LaunchedEffect(formFields.map { it.value.state.value }) {
         val values = formFields.map { it.value.state.value }
-        canLogin = values.all { it.isNotBlank() }
+        canSignup = values.all { it.isNotBlank() } && values[4] == values[5]
     }
 
     Column(
@@ -104,37 +131,52 @@ fun LoginScreen(navController: NavController) {
                 .padding(16.dp),
         ) {
             Text(
-                text = "Log in",
+                text = "Sign up",
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold
             )
         }
         formFields.forEach { formField ->
             val field = formField.value
-            OutlinedTextField(
-                modifier = fullWidth,
-                value = field.state.value,
-                onValueChange = { field.state.value = it },
-                label = { Text(field.label) },
-                visualTransformation = if (field.isSecure) PasswordVisualTransformation() else VisualTransformation.None,
-                keyboardOptions = if (field.isSecure)
-                    KeyboardOptions.Default.copy(
-                        autoCorrectEnabled = false,
-                        keyboardType = KeyboardType.NumberPassword
-                    ) else KeyboardOptions.Default
-            )
+            if (field.key == SignUpForm.FieldKey.DateOfBirth) {
+                DatePicker(
+                    onDateSelected = {
+                        field.state.value = DateUtils.convertDateFromPatternToISO(it, "d.M.yyyy")
+                    },
+                    label = field.label,
+                )
+            } else {
+                OutlinedTextField(
+                    modifier = fullWidth,
+                    value = field.state.value,
+                    onValueChange = { field.state.value = it },
+                    label = { Text(field.label) },
+                    visualTransformation = if (field.isSecure) PasswordVisualTransformation() else VisualTransformation.None,
+                    keyboardOptions = if (field.isSecure)
+                        KeyboardOptions.Default.copy(
+                            autoCorrectEnabled = false,
+                            keyboardType = KeyboardType.NumberPassword
+                        ) else KeyboardOptions.Default.copy(
+                        capitalization = if (field.key == SignUpForm.FieldKey.FirstName || field.key == SignUpForm.FieldKey.LastName || field.key == SignUpForm.FieldKey.Company)
+                            KeyboardCapitalization.Words else KeyboardCapitalization.None
+                    )
+                )
+            }
         }
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
                 isLoading = true
                 showError = false
-
                 CoroutineScope(Dispatchers.IO).launch {
                     val success =
-                        AuthApi.login(
-                            formFields[LoginForm.FieldKey.Email]!!.state.value,
-                            formFields[LoginForm.FieldKey.Password]!!.state.value,
+                        AuthApi.signUp(
+                            formFields[SignUpForm.FieldKey.FirstName]!!.state.value,
+                            formFields[SignUpForm.FieldKey.LastName]!!.state.value,
+                            formFields[SignUpForm.FieldKey.Company]!!.state.value,
+                            formFields[SignUpForm.FieldKey.Email]!!.state.value,
+                            formFields[SignUpForm.FieldKey.Password]!!.state.value,
+                            formFields[SignUpForm.FieldKey.DateOfBirth]!!.state.value,
                         )
                     withContext(Dispatchers.Main) {
                         isLoading = false
@@ -150,13 +192,13 @@ fun LoginScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
-            enabled = canLogin && !isLoading
+            enabled = canSignup && !isLoading
         ) {
-            Text(if (isLoading) "Logging in..." else "Log In")
+            Text(if (isLoading) "Signing up..." else "Sign Up")
         }
 
         if (showError) {
-            Text("Login failed", color = Color.Red)
+            Text("Sign up failed", color = Color.Red)
         }
 
         TextButton(
@@ -164,11 +206,11 @@ fun LoginScreen(navController: NavController) {
                 .align(alignment = Alignment.CenterHorizontally)
                 .fillMaxWidth()
                 .height(48.dp),
-            onClick = { navController.navigate("signup") }) {
+            onClick = { navController.navigate("login") }) {
             Text(
-                text = "Don't have an account? Sign up",
+                text = "Already have an account? Log in",
             )
-            Spacer(modifier = Modifier.height(16.dp))
         }
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }

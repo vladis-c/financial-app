@@ -1,4 +1,4 @@
-package com.vladisc.financial.app.screens
+package com.vladisc.financial.app.features.selectapps
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -9,17 +9,17 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.edit
 import androidx.navigation.NavController
 import com.vladisc.financial.app.components.CheckboxRow
-import androidx.core.content.edit
 
 @SuppressLint("QueryPermissionsNeeded")
 @Composable

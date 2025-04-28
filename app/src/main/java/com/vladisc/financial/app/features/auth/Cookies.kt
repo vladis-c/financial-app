@@ -1,4 +1,4 @@
-package com.vladisc.financial.app.storage
+package com.vladisc.financial.app.features.auth
 
 import android.content.Context
 import android.content.SharedPreferences

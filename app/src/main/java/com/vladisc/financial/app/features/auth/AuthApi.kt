@@ -1,8 +1,6 @@
-package com.vladisc.financial.app.api
+package com.vladisc.financial.app.features.auth
 
-import com.vladisc.financial.app.api.ApiClient.URL
-import com.vladisc.financial.app.api.ApiClient.client
-import com.vladisc.financial.app.storage.TokenStorage
+import com.vladisc.financial.app.ApiClient
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -18,7 +16,7 @@ object AuthApi {
         password: String,
         dateOfBirth: String
     ): Boolean {
-        val response = client.post("$URL/auth/signup") {
+        val response = ApiClient.client.post("${ApiClient.URL}/auth/signup") {
             contentType(ContentType.Application.Json)
             setBody(
                 mapOf(
@@ -33,14 +31,14 @@ object AuthApi {
         }
         val setCookieHeaders = response.headers.getAll("Set-Cookie") ?: emptyList()
         TokenStorage.extractCookies(setCookieHeaders)
-        return response.status == HttpStatusCode.Created
+        return response.status == HttpStatusCode.Companion.Created
     }
 
     suspend fun login(
         email: String,
         password: String,
     ): Boolean {
-        val response = client.post("$URL/auth/login") {
+        val response = ApiClient.client.post("${ApiClient.URL}/auth/login") {
             contentType(ContentType.Application.Json)
             setBody(
                 mapOf(
@@ -52,15 +50,15 @@ object AuthApi {
         val setCookieHeaders = response.headers.getAll("Set-Cookie") ?: emptyList()
         TokenStorage.extractCookies(setCookieHeaders)
 
-        return response.status == HttpStatusCode.OK
+        return response.status == HttpStatusCode.Companion.OK
     }
 
     suspend fun validate(): Boolean {
 //        TokenStorage.clear()
-        val response = client.post("$URL/auth/validate")
+        val response = ApiClient.client.post("${ApiClient.URL}/auth/validate")
         val setCookieHeaders = response.headers.getAll("Set-Cookie") ?: emptyList()
         TokenStorage.extractCookies(setCookieHeaders)
 
-        return response.status == HttpStatusCode.OK
+        return response.status == HttpStatusCode.Companion.OK
     }
 }

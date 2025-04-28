@@ -1,4 +1,4 @@
-package com.vladisc.financial.app.screens
+package com.vladisc.financial.app.features.auth
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,7 +8,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import com.vladisc.financial.app.api.AuthApi
 
 @Composable
 fun SplashScreen(navController: NavController) {
