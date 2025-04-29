@@ -11,9 +11,9 @@ import kotlinx.serialization.json.Json
 import java.util.concurrent.TimeUnit
 
 object ApiClient {
-    const val URL = "http://10.43.142.51:7070"
+//    const val URL = "http://10.43.142.51:7070"
 
-    //    const val URL = "http://192.168.1.203:7070"
+        const val URL = "http://192.168.1.203:7070"
     val client = HttpClient(OkHttp) {
         install(ContentNegotiation) {
             json(Json {
