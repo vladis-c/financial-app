@@ -3,3 +3,6 @@
 /build
 .kotlin
 .gradle
+keystore.*
+app-release*
+output-metadata.json
