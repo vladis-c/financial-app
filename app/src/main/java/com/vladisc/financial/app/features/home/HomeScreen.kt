@@ -79,14 +79,20 @@ fun HomeScreen(
                         "yyyy-MM-dd'T'HH:mm:ss"
                     ),
                     body = it.body,
-                    title = it.title
+                    title = it.title,
+                    id = it.id.toString()
                 )
             }
             println(pushNotifications)
             isUploading = true
-            pushNotificationsViewModel.postPushNotificationsInBatches(pushNotifications) {
-                isUploading = false
-            }
+            pushNotificationsViewModel.postPushNotificationsInBatches(
+                pushNotifications,
+                onComplete = {
+                    isUploading = false
+                },
+                onBatchComplete = {
+                    notificationViewModel.deleteNotifications(it)
+                })
         }
     }
 

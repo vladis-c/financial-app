@@ -24,7 +24,11 @@ class PushNotificationsViewModel : ViewModel() {
         }
     }
 
-    fun postPushNotificationsInBatches(pushNotifications: List<PushNotification>, onComplete: () -> Unit) {
+    fun postPushNotificationsInBatches(
+        pushNotifications: List<PushNotification>,
+        onComplete: () -> Unit,
+        onBatchComplete: (ids: List<Int?>) -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 val batchSize = 10
@@ -34,13 +38,14 @@ class PushNotificationsViewModel : ViewModel() {
                 while (index < total) {
                     val batch = pushNotifications.subList(index, minOf(index + batchSize, total))
                     try {
-                    PushNotificationsApi.post(batch)
+                        PushNotificationsApi.post(batch)
                     } catch (e: Exception) {
                         e.printStackTrace() // Shows full stacktrace
                         println("Failed to upload notifications: ${e.localizedMessage}")
                     }
                     index += batchSize
                     delay(500) // short delay between batches (adjust as needed)
+                    onBatchComplete(pushNotifications.map { it.id?.toInt() })
                 }
 
                 onComplete()

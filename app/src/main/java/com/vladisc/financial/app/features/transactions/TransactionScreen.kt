@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.vladisc.financial.app.features.user.UserViewModel
-import com.vladisc.financial.app.utils.DateUtils.convertDateFromPatternToISO
+import com.vladisc.financial.app.utils.DateUtils
 import java.text.DecimalFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -51,7 +51,7 @@ fun TransactionScreen(
 
     val scrollState = rememberScrollState()
 
-    val date = LocalDate.parse(convertDateFromPatternToISO(transaction?.timestamp.toString(), "yyyy-MM-dd'T'HH:mm")).format(DateTimeFormatter.ofPattern("d.M.yyyy"))
+    val date = LocalDate.parse(DateUtils.convertDateFromISOPattern(transaction?.timestamp.toString())).format(DateTimeFormatter.ofPattern("d.M.yyyy"))
     val amount = if(transaction?.type == TransactionType.EXPENSE) {
         "-${DecimalFormat("0.00").format(transaction.amount)} €"
     } else {

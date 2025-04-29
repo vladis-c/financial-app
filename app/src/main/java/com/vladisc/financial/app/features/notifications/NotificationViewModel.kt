@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class NotificationViewModel(application: Application) : AndroidViewModel(application) {
@@ -37,4 +38,9 @@ class NotificationViewModel(application: Application) : AndroidViewModel(applica
         _userId.value = uid
     }
 
+    fun deleteNotifications(notificationsIds: List<Int?>) {
+        viewModelScope.launch {
+            dao.deleteByIds(notificationsIds.filterNotNull())
+        }
+    }
 }

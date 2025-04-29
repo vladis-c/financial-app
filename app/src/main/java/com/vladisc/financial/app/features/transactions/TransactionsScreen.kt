@@ -35,7 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.vladisc.financial.app.features.user.UserViewModel
-import com.vladisc.financial.app.utils.DateUtils.convertDateFromPatternToISO
+import com.vladisc.financial.app.utils.DateUtils
 import java.text.DecimalFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -50,7 +50,7 @@ fun TransactionsScreen(
     val transactions by transactionsViewModel.transactions
     val groupedTransactions = transactions
         ?.groupBy {
-            val date = convertDateFromPatternToISO(it.timestamp.toString(), "yyyy-MM-dd'T'HH:mm")
+            val date = DateUtils.convertDateFromISOPattern(it.timestamp.toString())
             LocalDate.parse(date)
         }
         ?.toSortedMap(compareByDescending { it })
