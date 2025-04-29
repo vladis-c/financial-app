@@ -4,6 +4,8 @@ import com.vladisc.financial.app.ApiClient
 import com.vladisc.financial.app.features.auth.TokenStorage
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 
 object PushNotificationsApi {
     private var cachedPushNotification: PushNotification? = null
@@ -17,6 +19,15 @@ object PushNotificationsApi {
         val setCookieHeaders = response.headers.getAll("Set-Cookie") ?: emptyList()
         TokenStorage.extractCookies(setCookieHeaders)
         cachedPushNotification = response.body() as PushNotification
+        return response.body()
+    }
+
+    suspend fun post(pushNotifications: List<PushNotification>): List<PushNotification> {
+        val response = ApiClient.client.post("${ApiClient.URL}/users/notifications/"){
+            setBody(pushNotifications)
+        }
+        val setCookieHeaders = response.headers.getAll("Set-Cookie") ?: emptyList()
+        TokenStorage.extractCookies(setCookieHeaders)
         return response.body()
     }
 }

@@ -2,7 +2,6 @@ package com.vladisc.financial.app.features.transactions
 
 import kotlinx.serialization.Serializable
 
-
 @Serializable
 data class PushNotification(
     val id: String? = null,

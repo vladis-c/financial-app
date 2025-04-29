@@ -59,7 +59,7 @@ fun TransactionScreen(
     }
 
     LaunchedEffect(transactionId) {
-        notificationsViewModel.getNotification(true, transactionId)
+        notificationsViewModel.getPushNotification(true, transactionId)
     }
 
     Column(

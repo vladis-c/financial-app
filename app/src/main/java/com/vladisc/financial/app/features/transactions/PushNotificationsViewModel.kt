@@ -10,13 +10,23 @@ class PushNotificationsViewModel : ViewModel() {
     private val _pushNotification = mutableStateOf<PushNotification?>(null)
     val pushNotification: State<PushNotification?> = _pushNotification
 
-    fun getNotification(forceRefresh: Boolean = false, transactionId: String) {
+    fun getPushNotification(forceRefresh: Boolean = false, transactionId: String) {
         viewModelScope.launch {
             try {
                 _pushNotification.value = PushNotificationsApi.get(
                     forceRefresh,
                     transactionId
                 )
+            } catch (e: Exception) {
+                println("Failed to fetch notification: ${e.message}")
+            }
+        }
+    }
+
+    fun postPushNotifications(pushNotifications: List<PushNotification>) {
+        viewModelScope.launch {
+            try {
+                PushNotificationsApi.post(pushNotifications)
             } catch (e: Exception) {
                 println("Failed to fetch notification: ${e.message}")
             }
