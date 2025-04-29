@@ -2,23 +2,26 @@ package com.vladisc.financial.app.features.home
 
 import android.app.Application
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,12 +30,16 @@ import androidx.core.content.edit
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.vladisc.financial.app.features.notifications.NotificationViewModel
+import com.vladisc.financial.app.features.transactions.PushNotification
+import com.vladisc.financial.app.features.transactions.PushNotificationsViewModel
 import com.vladisc.financial.app.features.user.UserViewModel
+import com.vladisc.financial.app.utils.DateUtils
 
 @Composable
 fun HomeScreen(
     navController: NavController,
     userViewModel: UserViewModel,
+    pushNotificationsViewModel: PushNotificationsViewModel
 ) {
     val user by userViewModel.user
 
@@ -44,6 +51,7 @@ fun HomeScreen(
     )
 
     val notifications by notificationViewModel.notifications.collectAsState()
+    var isUploading by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         userViewModel.getUser()
@@ -52,9 +60,7 @@ fun HomeScreen(
     LaunchedEffect(user) {
         user?.let {
             val uid = it.uid
-            println("Getting notifications effect $uid")
             if (!uid.isNullOrBlank()) {
-                // TODO: remember to remove this user id when logging out
                 val prefs = context.getSharedPreferences("prefs", 0x0000)
                 prefs.edit() { putString("user_id", uid) }
                 notificationViewModel.setUserId(uid)
@@ -62,19 +68,48 @@ fun HomeScreen(
         }
     }
 
-    val listState = rememberLazyListState()
-    val scrollState = rememberScrollState()
+    LaunchedEffect(notifications) {
+        // Upload saved notifications
+        if (notifications.isNotEmpty()) {
+            println("notifications not empty")
+            val pushNotifications = notifications.map {
+                PushNotification(
+                    timestamp = DateUtils.convertMillisToDate(
+                        it.timestamp,
+                        "yyyy-MM-dd'T'HH:mm:ss"
+                    ),
+                    body = it.body,
+                    title = it.title
+                )
+            }
+            println(pushNotifications)
+            isUploading = true
+            pushNotificationsViewModel.postPushNotificationsInBatches(pushNotifications) {
+                isUploading = false
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(24.dp, 24.dp, 24.dp, 32.dp)
             .windowInsetsPadding(WindowInsets.statusBars)
-            .verticalScroll(scrollState)
             .imePadding()
             .wrapContentSize(Alignment.Center),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
+        ) {
+            if (isUploading) {
+                LinearProgressIndicator()
+                Text("Uploading notifications…")
+            }
+
+        }
         TextButton(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -83,59 +118,13 @@ fun HomeScreen(
                 text = "Transactions",
             )
         }
+        TextButton(
+            modifier = Modifier
+                .fillMaxWidth(),
+            onClick = { navController.navigate("select_apps") }) {
+            Text(
+                text = "Select banking app",
+            )
+        }
     }
-//    //TODO: fix this screen view
-//    Box(
-//        modifier = Modifier
-//            .padding(24.dp, 24.dp, 24.dp, 32.dp)
-//            .windowInsetsPadding(WindowInsets.statusBars)
-//            .imePadding()
-//            .wrapContentSize(Alignment.Center)
-//    ) {
-//
-//        Box(
-//            modifier = Modifier.fillMaxSize()
-//        ) {
-//            if (user != null) {
-//                Text("Welcome, ${user?.firstName ?: "User"}!")
-//            } else {
-//                Text("Loading...")
-//            }
-//        }
-//        TextButton(
-//            modifier = Modifier
-////            .align(alignment = Alignment.CenterHorizontally)
-//                .fillMaxWidth()
-//                .height(48.dp),
-//            onClick = { navController.navigate("select_apps") }) {
-//            Text(
-//                text = "Select banking app",
-//            )
-//        }
-//        LazyColumn(
-//            state = listState, modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(0.dp, 100.dp, 0.dp, 0.dp),
-//            verticalArrangement = Arrangement.spacedBy(8.dp)
-//        ) {
-//            items(notifications) { notification ->
-//                NotificationItem(
-//                    notification.title ?: "",
-//                    notification.body ?: "",
-//                    notification.packageName,
-//                )
-//            }
-//        }
-//    }
-
-    // Detect when scrolled to bottom
-//    LaunchedEffect(listState) {
-//        snapshotFlow { listState.layoutInfo }
-//            .collect { layoutInfo ->
-//                val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
-//                if (lastVisibleItem != null && lastVisibleItem.index >= notifications.size - 5) {
-//                    // TODO paging
-//                }
-//            }
-//    }
 }

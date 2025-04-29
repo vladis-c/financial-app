@@ -16,14 +16,24 @@ import com.vladisc.financial.app.features.transactions.TransactionsViewModel
 import com.vladisc.financial.app.features.user.UserViewModel
 
 @Composable
-fun AppNavigator(userViewModel: UserViewModel, transactionsViewModel: TransactionsViewModel, notificationsViewModel: PushNotificationsViewModel) {
+fun AppNavigator(
+    userViewModel: UserViewModel,
+    transactionsViewModel: TransactionsViewModel,
+    pushNotificationsViewModel: PushNotificationsViewModel
+) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "splash") {
         composable("splash") { SplashScreen(navController) }
         composable("signup") { SignUpScreen(navController) }
         composable("login") { LoginScreen(navController) }
-        composable("home") { HomeScreen(navController, userViewModel) }
+        composable("home") {
+            HomeScreen(
+                navController,
+                userViewModel,
+                pushNotificationsViewModel
+            )
+        }
         composable("transactions") {
             TransactionsScreen(
                 navController,
@@ -31,13 +41,13 @@ fun AppNavigator(userViewModel: UserViewModel, transactionsViewModel: Transactio
                 transactionsViewModel
             )
         }
-        composable("transaction/{id}") {backStackEntry ->
+        composable("transaction/{id}") { backStackEntry ->
             val id = backStackEntry.arguments?.getString("id") ?: ""
             TransactionScreen(
                 navController,
                 userViewModel,
                 transactionsViewModel,
-                notificationsViewModel,
+                pushNotificationsViewModel,
                 id
             )
         }

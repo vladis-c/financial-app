@@ -6,6 +6,8 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 
 object PushNotificationsApi {
     private var cachedPushNotification: PushNotification? = null
@@ -23,8 +25,10 @@ object PushNotificationsApi {
     }
 
     suspend fun post(pushNotifications: List<PushNotification>): List<PushNotification> {
-        val response = ApiClient.client.post("${ApiClient.URL}/users/notifications/"){
-            setBody(pushNotifications)
+        println("Posting push notifications: $pushNotifications")
+        val response = ApiClient.client.post("${ApiClient.URL}/users/notifications/") {
+            contentType(ContentType.Application.Json)
+            setBody(pushNotifications.toList())
         }
         val setCookieHeaders = response.headers.getAll("Set-Cookie") ?: emptyList()
         TokenStorage.extractCookies(setCookieHeaders)

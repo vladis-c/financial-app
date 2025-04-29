@@ -4,6 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class PushNotificationsViewModel : ViewModel() {
@@ -23,12 +24,29 @@ class PushNotificationsViewModel : ViewModel() {
         }
     }
 
-    fun postPushNotifications(pushNotifications: List<PushNotification>) {
+    fun postPushNotificationsInBatches(pushNotifications: List<PushNotification>, onComplete: () -> Unit) {
         viewModelScope.launch {
             try {
-                PushNotificationsApi.post(pushNotifications)
+                val batchSize = 10
+                val total = pushNotifications.size
+                var index = 0
+
+                while (index < total) {
+                    val batch = pushNotifications.subList(index, minOf(index + batchSize, total))
+                    try {
+                    PushNotificationsApi.post(batch)
+                    } catch (e: Exception) {
+                        e.printStackTrace() // Shows full stacktrace
+                        println("Failed to upload notifications: ${e.localizedMessage}")
+                    }
+                    index += batchSize
+                    delay(500) // short delay between batches (adjust as needed)
+                }
+
+                onComplete()
             } catch (e: Exception) {
-                println("Failed to fetch notification: ${e.message}")
+                println("Failed to upload notifications: ${e.message}")
+                onComplete() // still stop spinner on failure
             }
         }
     }
