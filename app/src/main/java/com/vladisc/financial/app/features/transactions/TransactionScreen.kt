@@ -2,8 +2,10 @@ package com.vladisc.financial.app.features.transactions
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
@@ -21,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,10 +41,13 @@ fun TransactionScreen(
     navController: NavController,
     userViewModel: UserViewModel,
     transactionsViewModel: TransactionsViewModel,
+    notificationsViewModel: PushNotificationsViewModel,
     transactionId: String
 ) {
     val transactions by transactionsViewModel.transactions
     val transaction = transactions?.find { it.id == transactionId }
+
+    val notification by notificationsViewModel.pushNotification
 
     val scrollState = rememberScrollState()
 
@@ -50,6 +56,10 @@ fun TransactionScreen(
         "-${DecimalFormat("0.00").format(transaction.amount)} €"
     } else {
         "${DecimalFormat("0.00").format(transaction?.amount)} €"
+    }
+
+    LaunchedEffect(transactionId) {
+        notificationsViewModel.getNotification(true, transactionId)
     }
 
     Column(
@@ -106,6 +116,21 @@ fun TransactionScreen(
                 modifier = Modifier
                     .padding(16.dp)
             )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Associated push notification",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+            )
+            Text(
+                text = "${notification?.title}. ${notification?.body}",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
         }
     }
 }

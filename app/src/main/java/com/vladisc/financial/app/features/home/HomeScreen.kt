@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -130,13 +129,13 @@ fun HomeScreen(
 //    }
 
     // Detect when scrolled to bottom
-    LaunchedEffect(listState) {
-        snapshotFlow { listState.layoutInfo }
-            .collect { layoutInfo ->
-                val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
-                if (lastVisibleItem != null && lastVisibleItem.index >= notifications.size - 5) {
-                    // TODO paging
-                }
-            }
-    }
+//    LaunchedEffect(listState) {
+//        snapshotFlow { listState.layoutInfo }
+//            .collect { layoutInfo ->
+//                val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
+//                if (lastVisibleItem != null && lastVisibleItem.index >= notifications.size - 5) {
+//                    // TODO paging
+//                }
+//            }
+//    }
 }

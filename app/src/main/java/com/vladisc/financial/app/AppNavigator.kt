@@ -9,13 +9,14 @@ import com.vladisc.financial.app.features.auth.SignUpScreen
 import com.vladisc.financial.app.features.auth.SplashScreen
 import com.vladisc.financial.app.features.home.HomeScreen
 import com.vladisc.financial.app.features.selectapps.SelectAppsScreen
+import com.vladisc.financial.app.features.transactions.PushNotificationsViewModel
 import com.vladisc.financial.app.features.transactions.TransactionScreen
 import com.vladisc.financial.app.features.transactions.TransactionsScreen
 import com.vladisc.financial.app.features.transactions.TransactionsViewModel
 import com.vladisc.financial.app.features.user.UserViewModel
 
 @Composable
-fun AppNavigator(userViewModel: UserViewModel, transactionsViewModel: TransactionsViewModel) {
+fun AppNavigator(userViewModel: UserViewModel, transactionsViewModel: TransactionsViewModel, notificationsViewModel: PushNotificationsViewModel) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "splash") {
@@ -36,6 +37,7 @@ fun AppNavigator(userViewModel: UserViewModel, transactionsViewModel: Transactio
                 navController,
                 userViewModel,
                 transactionsViewModel,
+                notificationsViewModel,
                 id
             )
         }

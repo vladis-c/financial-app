@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.vladisc.financial.app.features.auth.TokenStorage
 import com.vladisc.financial.app.features.notifications.NotificationListener
+import com.vladisc.financial.app.features.transactions.PushNotificationsViewModel
 import com.vladisc.financial.app.features.transactions.TransactionsViewModel
 import com.vladisc.financial.app.features.user.UserViewModel
 import com.vladisc.financial.app.ui.theme.FinancialAppTheme
@@ -16,6 +17,7 @@ import com.vladisc.financial.app.ui.theme.FinancialAppTheme
 class MainActivity : ComponentActivity() {
     val userViewModel = UserViewModel()
     val transactionsViewModel = TransactionsViewModel()
+    val notificationsViewModel = PushNotificationsViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,7 +25,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FinancialAppTheme {
-                AppNavigator(userViewModel, transactionsViewModel)
+                AppNavigator(userViewModel, transactionsViewModel, notificationsViewModel)
             }
         }
         // enabling push notifications interception

@@ -56,14 +56,13 @@ fun TransactionsScreen(
         ?.toSortedMap(compareByDescending { it })
         ?.mapKeys { it.key.format(DateTimeFormatter.ofPattern("d.M.yyyy")) }
 
-    var loadedWeeks by remember { mutableIntStateOf(1) }
+    var loadedWeeks by remember { mutableIntStateOf(4) }
     val lazyListState = rememberLazyListState()
 
-
-    LaunchedEffect(Unit) {
+    LaunchedEffect(loadedWeeks) {
         val end = LocalDate.now()
         val start = end.minusDays((7L * loadedWeeks - 1))
-        transactionsViewModel.getTransactions(false, start, end)
+        transactionsViewModel.getTransactions(true, start, end)
     }
 
     // Detect end of list reached
@@ -76,7 +75,6 @@ fun TransactionsScreen(
                 }
             }
     }
-
 
     Column(
         modifier = Modifier
@@ -103,11 +101,11 @@ fun TransactionsScreen(
             }
         )
 
-
         // Transactions list
         LazyColumn(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            state = lazyListState,
         ) {
             groupedTransactions?.forEach { (date, transactionsOnDate) ->
                 item {
@@ -130,7 +128,7 @@ fun TransactionsScreen(
 
 @Composable
 fun TransactionItem(transaction: Transaction, onClick: () -> Unit) {
-    val amount = if(transaction.type == TransactionType.EXPENSE) {
+    val amount = if (transaction.type == TransactionType.EXPENSE) {
         "-${DecimalFormat("0.00").format(transaction.amount)} €"
     } else {
         "${DecimalFormat("0.00").format(transaction.amount)} €"
