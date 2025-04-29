@@ -2,19 +2,17 @@ package com.vladisc.financial.app.features.home
 
 import android.app.Application
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -29,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.vladisc.financial.app.features.notifications.NotificationItem
 import com.vladisc.financial.app.features.notifications.NotificationViewModel
 import com.vladisc.financial.app.features.user.UserViewModel
 
@@ -67,50 +64,70 @@ fun HomeScreen(
     }
 
     val listState = rememberLazyListState()
+    val scrollState = rememberScrollState()
 
-    //TODO: fix this screen view
-    Box(
+    Column(
         modifier = Modifier
+            .fillMaxWidth()
             .padding(24.dp, 24.dp, 24.dp, 32.dp)
             .windowInsetsPadding(WindowInsets.statusBars)
+            .verticalScroll(scrollState)
             .imePadding()
-            .wrapContentSize(Alignment.Center)
+            .wrapContentSize(Alignment.Center),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            if (user != null) {
-                Text("Welcome, ${user?.firstName ?: "User"}!")
-            } else {
-                Text("Loading...")
-            }
-        }
         TextButton(
             modifier = Modifier
-//            .align(alignment = Alignment.CenterHorizontally)
-                .fillMaxWidth()
-                .height(48.dp),
-            onClick = { navController.navigate("select_apps") }) {
+                .fillMaxWidth(),
+            onClick = { navController.navigate("transactions") }) {
             Text(
-                text = "Select banking app",
+                text = "Transactions",
             )
         }
-        LazyColumn(
-            state = listState, modifier = Modifier
-                .fillMaxWidth().padding(0.dp, 100.dp, 0.dp, 0.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(notifications) { notification ->
-                NotificationItem(
-                    notification.title ?: "",
-                    notification.body ?: "",
-                    notification.packageName,
-                )
-            }
-        }
-
     }
+//    //TODO: fix this screen view
+//    Box(
+//        modifier = Modifier
+//            .padding(24.dp, 24.dp, 24.dp, 32.dp)
+//            .windowInsetsPadding(WindowInsets.statusBars)
+//            .imePadding()
+//            .wrapContentSize(Alignment.Center)
+//    ) {
+//
+//        Box(
+//            modifier = Modifier.fillMaxSize()
+//        ) {
+//            if (user != null) {
+//                Text("Welcome, ${user?.firstName ?: "User"}!")
+//            } else {
+//                Text("Loading...")
+//            }
+//        }
+//        TextButton(
+//            modifier = Modifier
+////            .align(alignment = Alignment.CenterHorizontally)
+//                .fillMaxWidth()
+//                .height(48.dp),
+//            onClick = { navController.navigate("select_apps") }) {
+//            Text(
+//                text = "Select banking app",
+//            )
+//        }
+//        LazyColumn(
+//            state = listState, modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(0.dp, 100.dp, 0.dp, 0.dp),
+//            verticalArrangement = Arrangement.spacedBy(8.dp)
+//        ) {
+//            items(notifications) { notification ->
+//                NotificationItem(
+//                    notification.title ?: "",
+//                    notification.body ?: "",
+//                    notification.packageName,
+//                )
+//            }
+//        }
+//    }
 
     // Detect when scrolled to bottom
     LaunchedEffect(listState) {
